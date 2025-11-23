@@ -1,18 +1,18 @@
-use anyhow::{Context, Result, anyhow};
-use sed_manager::applications::{change_password, list_password_authorities};
+use crate::utils::open_device_or_fake;
+use anyhow::{anyhow, Context, Result};
 use sed_manager::applications::get_general_lookup;
-use sed_manager::device::open_device;
-use sed_manager::tper::TPer;
+use sed_manager::applications::{change_password, list_password_authorities};
 use sed_manager::rpc::TokioRuntime;
+use sed_manager::tper::TPer;
 use std::sync::Arc;
 
 pub async fn run(
-    device_path: String, 
-    authority_name: String, 
-    old_password: Option<String>, 
-    new_password: Option<String>
+    device_path: String,
+    authority_name: String,
+    old_password: Option<String>,
+    new_password: Option<String>,
 ) -> Result<()> {
-    let device = open_device(&device_path).context("Failed to open device")?;
+    let device = open_device_or_fake(&device_path).context("Failed to open device")?;
     let device: Arc<dyn sed_manager::device::Device> = device.into();
     let runtime = Arc::new(TokioRuntime::new());
     let tper = TPer::new_on_default_com_id(device, runtime).context("Failed to create TPer")?;
@@ -42,7 +42,7 @@ pub async fn run(
 
     println!("Changing password for {}...", authority_name);
     change_password(&tper, sp, authority, old_password_bytes, new_password_bytes).await?;
-    
+
     println!("Password changed successfully.");
 
     Ok(())
