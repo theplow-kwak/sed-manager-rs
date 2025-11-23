@@ -8,5 +8,6 @@ members = [
     "sed_manager_unlock",
     "skip_test", "skip_test_macros",
     "as_array",
-    "as_array_macros"
+    "as_array_macros",
+    "sed_manager_cli"
 ]
