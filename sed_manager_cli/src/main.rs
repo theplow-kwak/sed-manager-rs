@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 mod commands;
+pub mod utils;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -59,6 +60,14 @@ enum Commands {
         new_sid_password: Option<String>,
     },
     // TODO: Add other commands
+    /// Discover device capabilities
+    Discovery(commands::discovery::DiscoveryArgs),
+    /// Manage locking ranges
+    Range(commands::range::RangeArgs),
+    /// Manage users
+    User(commands::user::UserArgs),
+    /// Manage permissions
+    Permission(commands::permission::PermissionArgs),
 }
 
 #[tokio::main]
@@ -82,6 +91,18 @@ async fn main() -> Result<()> {
         }
         Commands::TakeOwnership { device, sid_password, new_sid_password } => {
             commands::take_ownership::run(device, sid_password, new_sid_password).await?;
+        }
+        Commands::Discovery(args) => {
+            commands::discovery::run(args).await?;
+        }
+        Commands::Range(args) => {
+            commands::range::run(args).await?;
+        }
+        Commands::User(args) => {
+            commands::user::run(args).await?;
+        }
+        Commands::Permission(args) => {
+            commands::permission::run(args).await?;
         }
     }
 
